@@ -1,0 +1,6 @@
+{% extends 'main/form-layout.html' %}
+<p>Are you sure you want to delete your profile? This action cannot be undone.</p>
+{% block form %}
+    <button type="submit" class="btn btn-danger">Yes, Delete My Profile</button>
+    <a href="{% url 'authorization_app:edit_profile' %}" class="btn btn-secondary">Cancel</a>
+{% endblock form %}

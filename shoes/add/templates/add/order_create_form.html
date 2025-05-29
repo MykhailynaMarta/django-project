@@ -1,0 +1,9 @@
+{% extends 'main/form-layout.html' %}
+{% block form %}
+    {{ form.as_p }}
+    {% if user.is_authenticated %}
+        <button type="button" id="fill-user-data" class="btn btn-outline-primary">Додати дані при реєстрації</button>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Зберегти</button>
+{% endblock %}

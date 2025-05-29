@@ -1,0 +1,122 @@
+{% extends 'main/form-layout.html' %}
+{% load custom_filters %}
+{% block form %}
+    <div class="col-12">
+        <label for="sh_name" class="form-label">Name</label>
+        {{ form.sh_name|add_class:"form-control" }}
+        {% if form.sh_name.errors %}
+            <div class="text-danger">{{ form.sh_name.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <div class="col-12">
+        <label for="sh_model" class="form-label">Model</label>
+        {{ form.sh_model|add_class:"form-control" }}
+        {% if form.sh_model.errors %}
+            <div class="text-danger">{{ form.sh_model.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <div class="col-12">
+        <label for="sh_size" class="form-label">Size</label>
+        {{ form.sh_size|add_class:"form-control" }}
+        {% if form.sh_size.errors %}
+            <div class="text-danger">{{ form.sh_size.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <div class="col-12">
+        <label for="sh_color" class="form-label">Color</label>
+        {{ form.sh_color|add_class:"form-control" }}
+        {% if form.sh_color.errors %}
+            <div class="text-danger">{{ form.sh_color.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <div class="col-12">
+        <label for="sh_manufacturer" class="form-label">Manufacturer</label>
+        {{ form.sh_manufacturer|add_class:"form-control" }}
+        {% if form.sh_manufacturer.errors %}
+            <div class="text-danger">{{ form.sh_manufacturer.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <div class="col-12">
+        <label for="sh_count" class="form-label">Count</label>
+        {{ form.sh_count|add_class:"form-control" }}
+        {% if form.sh_count.errors %}
+            <div class="text-danger">{{ form.sh_count.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <div class="col-12">
+        <label for="sh_price" class="form-label">Price</label>
+        {{ form.sh_price|add_class:"form-control" }}
+        {% if form.sh_price.errors %}
+            <div class="text-danger">{{ form.sh_price.errors.0 }}</div>
+        {% endif %}
+    </div>
+
+    <div class="col-12">
+        <label for="sh_gender" class="form-label">Gender</label>
+        {{ form.sh_gender|add_class:"form-control" }}
+        {% if form.sh_gender.errors %}
+            <div class="text-danger">{{ form.sh_gender.errors.0 }}</div>
+        {% endif %}
+    </div>
+{% if not is_editing %}
+    <div class="col-12">
+        <label for="sh_image" class="form-label">Image</label>
+        <input type="file" name="sh_image" id="sh_image" multiple class="form-control">
+{#        {{ form.sh_image|add_class:"form-control" }}#}
+        {% if form.sh_image.errors %}
+            <div class="text-danger">{{ form.sh_image.errors.0 }}</div>
+        {% endif %}
+    </div>
+   {% else %}
+    <label for="existing-images">Existing Images:</label>
+    <div id="existing-images" class="form-control">
+        {% for image in existing_images %}
+            <div class="image-container" data-image-id="{{ image.id }}">
+                <img src="{{ image.image.url }}" alt="Product Image" style="width: 100px; height: auto;">
+                <button type="button" class="delete-image-btn btn-default" data-image-id="{{ image.id }}">✖</button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <label for="new-images">Add New Images:</label>
+    <input type="file" id="new-images" name="new_images" class="form-control" multiple>
+{% endif %}
+    {% if form_errors %}
+    	<div class="messages-conatiner">
+            <p>{{ form_errors }}</p>
+        </div>
+    {% endif %}
+    <div class="col-12">
+        <button type="submit" class="btn btn-outline">Add</button>
+    </div>
+<script>
+    // Видалення фотографій через AJAX
+    document.querySelectorAll('.delete-image-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const imageId = this.dataset.imageId;
+            fetch("{% url 'edit_app:delete_image' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ image_id: imageId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelector(`.image-container[data-image-id='${imageId}']`).remove();
+                } else {
+                    alert(data.error);
+                }
+            });
+        });
+    });
+</script>
+{% endblock form %}

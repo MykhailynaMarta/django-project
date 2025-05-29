@@ -1,0 +1,22 @@
+{% extends 'main/layout.html' %}
+{% load custom_filters %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="form-container">
+            <h3>Register</h3>
+            <form method="post" action="{% url 'authorization_app:login' %}">
+                {% csrf_token %}
+                {{ form.username.label_tag }} {{ form.username|add_class:"form-control"}}
+                {{ form.password.label_tag }} {{ form.password }}
+{#                {% if form.username.errors %}#}
+                        <div class="text-danger">{{ form.errors }}</div>
+{#                    {% endif %}#}
+{#                {% if form.password.errors %}#}
+                        <div class="text-danger">{{ form.errors }}</div>
+{#                    {% endif %}#}
+                <button style="margin: 10px 0" type="submit" class="btn btn-outline">Log In</button>
+            </form>
+            <p>Don't have an account? <a href="{% url 'authorization_app:register' %}">Register</a></p>
+        </div>
+    </div>
+{% endblock content %}

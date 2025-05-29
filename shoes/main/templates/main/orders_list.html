@@ -1,0 +1,44 @@
+{% extends 'main/layout.html' %}
+{% load custom_filters %}
+{% block content %}
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            {% for field in fields %}
+                <th scope="col">{{ field.verbose_name }}</th>
+            {% endfor %}
+            {% if user.is_staff or user.is_superuser %}
+                <th scope="col">Actions</th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for obj in object_list %}
+            <tr>
+                {% for field in fields %}
+                    <td>{{ obj|getattr_safe:field.name }}</td>
+                {% endfor %}
+                {% if user.is_staff or user.is_superuser or user.users_role == ADMIN %}
+                    <td>
+                        <a href="{% url 'edit_app:update' model_name='orders' pk=obj.pk %}"
+                           class="btn btn-primary btn-sm">Edit</a>
+                        <div class="form-delete btn-sm">
+                            <form action="{% url 'main_app:delete' model_name='orders' pk=obj.get_pk %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% if messages %}
+{% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+{% endif %}
+
+{% endblock content %}

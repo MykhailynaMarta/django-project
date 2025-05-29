@@ -1,0 +1,41 @@
+@import url("products_list_style.css");
+@import url("form-style.css");
+
+img{
+    width: 100%;
+    display: block;
+}
+p{
+    margin: 0;
+    padding: 0;
+}
+.navbar{
+    padding-left: 50px;
+    padding-right: 50px;
+}
+.navbar-background{
+        background: #7db098;
+}
+.user-name{
+    margin: 0 10px;
+}
+
+.form-container{
+    max-width: 80%;
+    margin: 20px auto;
+    padding: 10px;
+    /*border: 2px solid brown;*/
+    border-radius: 10px;
+}
+
+.btn-outline{
+  border: 2px solid black;
+  background-color: transparent;
+  color: black;
+
+  cursor: pointer;
+}
+.btn-outline:hover{
+    background-color: black;
+    color: white;
+}

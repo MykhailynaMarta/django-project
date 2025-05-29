@@ -1,0 +1,144 @@
+{% extends 'main/layout.html' %}
+{% load custom_filters %}
+{% load static %}
+{% block wrapper %}
+    <div class="landing">
+        <form method="get" action="{% url 'main_app:products_list' %}">
+            <!-- Фільтр за статтю -->
+            <label for="sh_gender">Gender:</label>
+            <select name="sh_gender" id="sh_gender">
+                <option value="">All</option>
+                {% for gender in genders %}
+                    <option value="{{ gender }}" {% if gender == selected_gender %}selected{% endif %}>
+                        {{ gender }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Фільтр за моделями -->
+            <label for="model">Model:</label>
+            <select name="sh_model" id="model">
+                <option value="">All</option>
+                {% for model in models %}
+                    <option value="{{ model }}" {% if model == selected_model %}selected{% endif %}>
+                        {{ model }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Пошук за назвою -->
+            <label for="search">Search:</label>
+            <input type="text" id="search" name="search" value="{{ search_query }}" placeholder="Enter product name">
+
+            <!-- Кнопка фільтрації -->
+            <button type="submit">Filter</button>
+        </form>
+
+        <div class="items-container">
+            {% for item in product_list %}
+                <div class="item-container">
+                    <div class="item-image-container">
+                        <div class="item-like-container">
+                            <img class="item-like-btn" src="{% static 'main/images/like-icon.svg' %}" alt="">
+                        </div>
+                        {% if item.get_images %}
+                            <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    {% for image in item.get_images %}
+                                        <div class="carousel-item active item-image-container" data-bs-interval="10000">
+                                            <img class="item-image" src="{{ image }}" alt="{{ item.sh_name }}">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="carousel-control-prev" type="button"
+                                        data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button"
+                                        data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        {% else %}
+                            <p>No image available</p>
+                        {% endif %}
+                    </div>
+                    <div class="item-description-container">
+                        <p>{{ item.sh_name }}</p>
+                        <div class="item-data-container">
+                            <div class="item-price-container"><p>${{ item.sh_price }}</p></div>
+                            <div class="item-amount-container"><p>{{ item.sh_count }}</p></div>
+                            <div class="second-line-data-container">
+                                <div class="item-label-container"><p>New Arrivals</p></div>
+                            </div>
+                        </div>
+                        <div class="item-actions-container">
+                            {% if user.is_authenticated %}
+                                {% if user.is_staff or user.is_superuser or user.user_role == 'admin' %}
+                                    <div class="delete-btn btn btn-danger"
+                                         style="display:flex; justify-content:center; margin: 10px;">
+                                        <form action="{% url 'main_app:delete' model_name='shoes' pk=item.id_shoes %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <input type="submit" value="Delete"
+                                                   style="background: transparent; border: none;">
+                                        </form>
+                                    </div>
+                                    <div class="edit-btn btn btn-success"
+                                         style="display:flex; justify-content:center; margin: 10px;">
+                                        <a href="{% url 'edit_app:update' model_name='shoes' pk=item.get_pk %}"
+                                           style="text-decoration: none; color:#000;">Edit</a>
+                                    </div>
+                                    {#                                    <div class="add-btn btn btn-outline" style="display:flex; justify-content:center; margin: 10px;">#}
+                                    <form action="{% url 'edit_app:add_quantity' model_name='shoes' user_id=user.id pk=item.get_pk %}"
+                                          method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="sh_count" value="1">
+                                        <button type="submit" class="btn btn-outline" style="margin: 10px;">Add
+                                            quantity
+                                        </button>
+                                    </form>
+                                    <form action="{% url 'edit_app:minus_quantity' model_name='shoes' pk=item.get_pk %}"
+                                          method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="sh_count" value="1">
+
+                                        <button type="submit" class="btn btn-outline" style="margin: 10px;">Minus
+                                            quantity
+                                        </button>
+                                    </form>
+                                    {#                                    </div>#}
+                                {% endif %}
+                            {% endif %}
+                            <div class="add-to-cart-btn btn-light">
+                                {% if item.sh_count == 0 %}
+                                    <p>Out of Stock</p>
+                                    {% if item.id_shoes in is_subscribed %}
+                                        <form action="{% url 'main_app:unsubscribe_from_item' user_id=user.id product_id=item.id_shoes %}"
+                                          class="" method="post">
+                                            {% csrf_token %}
+                                            <button class="btn-subscribe">Unsubscribe</button>
+                                        </form>
+                                     {% else %}
+                                        <form action="{% url 'main_app:subscribe_for_item' user_id=user.id product_id=item.id_shoes %}"
+                                              class="" method="post">
+                                            {% csrf_token %}
+                                            <button class="btn-subscribe">Subscribe</button>
+                                        </form>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{% url 'add_app:orders_create' item.id_shoes %}">Add to cart</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="message">
+        {{ context }}
+    </div>
+{% endblock wrapper %}

@@ -1,0 +1,12 @@
+{% extends 'main/layout.html' %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="form-container">
+            <form class="row g-3"  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% block form %}
+                {% endblock form %}
+            </form>
+        </div>
+    </div>
+{% endblock content %}

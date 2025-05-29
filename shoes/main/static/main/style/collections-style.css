@@ -1,0 +1,14 @@
+.add_collection-draw{
+    width: 200px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.add_collection-draw button{
+    border: none;
+    background-color: rgba(0,0,0,0.36);
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}

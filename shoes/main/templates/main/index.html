@@ -1,0 +1,64 @@
+{% extends 'main/layout.html' %}
+{% block wrapper %}
+    <div>
+    {% if user.is_authenticated %}
+    {% if user.is_staff or user.is_superuser or user.users_role == ADMIN %}
+ <div class="analytics-wrapper">
+  <div class="analytics-page-wrapper">
+      <div class="order-sum-container  analytics-column-container">
+          <p class="analytics-container__name-of-column">Загальна сума</p>
+          <div class="analytics-container__column-line"></div>
+          <p class="analytics-container__calculation">
+              <span class="product-price" data-base-price="{{ total_sum }}">
+                  <i class="fa-solid fa-hryvnia-sign"></i>{{ total_sum }}</span>
+          </p>
+      </div>
+      <div class="order-sum-avarage-container  analytics-column-container">
+          <p class="analytics-container__name-of-column">Середня сума</p>
+          <div class="analytics-container__column-line"></div>
+          <p class="analytics-container__calculation">
+              <span class="product-price" data-base-price="{{ average_sum }}">
+                  <i class="fa-solid fa-hryvnia-sign"></i>{{ average_sum }}</span>
+          </p>
+      </div>
+      <div class="order-sum-max-container  analytics-column-container">
+          <p class="analytics-container__name-of-column">Максимальна сума</p>
+          <div class="analytics-container__column-line"></div>
+          <p class="analytics-container__calculation">
+              <span class="product-price" data-base-price="{{ max_sum }}">
+                  <i class="fa-solid fa-hryvnia-sign"></i>{{ max_sum }}</span>
+          </p>
+      </div>
+      <div class="order-sum-min-container  analytics-column-container">
+          <p class="analytics-container__name-of-column">Мінімальна сума</p>
+          <div class="analytics-container__column-line"></div>
+          <p class="analytics-container__calculation">
+              <span class="product-price" data-base-price="{{ min_sum }}">
+                  <i class="fa-solid fa-hryvnia-sign"></i>{{ min_sum }}</span>
+          </p>
+      </div>
+      <div class="order-sum-for-month-container  analytics-column-container">
+          <p class="analytics-container__name-of-column">Загальна сума протягом місяця</p>
+          <div class="analytics-container__column-line"></div>
+          <p class="analytics-container__calculation">
+              <span class="product-price" data-base-price="{{ total_sum_for_current_month }}">
+                  <i class="fa-solid fa-hryvnia-sign"></i>{{ total_sum_for_current_month }}</span>
+          </p>
+      </div>
+      <div class="calculate_percentage_drop-container  analytics-column-container">
+          <p class="analytics-container__name-of-column">Продажі порівняно з минулим місяцем</p>
+          <div class="analytics-container__column-line"></div>
+          <p class="analytics-container__calculation">
+              <span class="product-price" data-base-price="{{ calculate_percentage_drop }}">
+                  %{{ calculate_percentage_drop }}</span>
+          </p>
+      </div>
+  </div>
+
+  </div>
+        {% endif %}
+        {% endif %}
+</div>
+
+
+{% endblock wrapper %}

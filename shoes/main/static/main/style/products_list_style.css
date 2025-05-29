@@ -1,0 +1,91 @@
+.landing {
+    width: 100%;
+}
+
+.items-container {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+.item-container {
+    max-width: 300px;
+    /*max-height: 500px;*/
+    height: auto;
+    width: 100%;
+    box-shadow: 0px 0px 9px -1px rgba(0,0,0,0.75);
+}
+
+.item-image-container {
+    width: 100%;
+    height: 350px;
+    /*height: 100%;*/
+    position: relative;
+}
+.item-like-container{
+    position: absolute;
+    max-width: 50px;
+    max-height: 50px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    right: 10px;
+    top: 10px;
+}
+.item-like-container .item-like-btn{
+    width: 24px;
+    height: 24px;
+}
+.item-image-container .item-image{
+    object-fit: contain;
+    object-position: center;
+}
+
+.item-description-container {
+    margin: 15px 3px;
+    padding: 0 10px;
+}
+
+.item-data-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    flex-wrap: wrap;
+}
+.item-price-container {
+}
+
+.item-amount-container {
+    display: flex;
+    text-align: center;
+}
+.second-line-data-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    width: 100%;
+}
+.item-old-price, .item-label-container {
+    flex: 1;
+}
+.item-old-price {
+    color: rgba(0, 0, 0, 0.3);
+    text-decoration: line-through;
+}
+.item-label-container {
+    background-color: black;
+    width: 95px;
+    height: 21px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 10px;
+}
+.item-label-container p{
+    color: white;
+    text-transform: capitalize;
+}
