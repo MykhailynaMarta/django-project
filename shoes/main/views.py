@@ -114,7 +114,7 @@ def products_list(request):
         'models': Shoes.objects.values_list('sh_model', flat=True).distinct(),
     }
 
-    return render(request, 'main/index1.html', context)
+    return render(request, 'main/product_list1.html', context)
 
 def subscribe_for_item(request, product_id, user_id):
     user = CustomUser.objects.get(pk=user_id)
@@ -141,76 +141,84 @@ def unsubscribe_from_item(request, product_id, user_id):
 
     return redirect('main_app:products_list')
 
+MODEL_MAP = {
+    'shoes': {
+        'model': Shoes,
+        'lookup': 'pk',
+        'images_related_name': 'images',
+    },
+    'collections': {
+        'model': Collection,
+        'lookup': 'pk',
+        'images_related_name': 'c_images',
+    },
+    'orders': {
+        'model': Orders,
+        'lookup': 'pk',
+    },
+    'users': {
+        'model': CustomUser,
+        'lookup': 'pk',
+    },
+}
 @transaction.atomic
 @login_required(login_url='authorization_app:login')
 def delete_view(request, model_name, pk):
-    # Карта моделей для видалення
-    model_map = {
-        'shoes': Shoes,
-        'orders': Orders,
-        'users': CustomUser,
-    }
+    config = MODEL_MAP.get(model_name.lower())
+    if not config:
+        return render(request, 'main/index1.html', {'message': 'Model not found'})
 
-    # Отримуємо модель за назвою
-    model = model_map.get(model_name.lower())
-    if not model:
-        return render(request, 'main/index.html', {'message': 'Model not found'})
+    model = config['model']
+    lookup_field = config.get('lookup', 'pk')
+    images_related_name = config.get('images_related_name')
 
-    # Отримуємо екземпляр об'єкта
-    instance = get_object_or_404(model, pk=pk)
+    # Отримуємо об'єкт для видалення
+    instance = get_object_or_404(model, **{lookup_field: pk})
 
-    # Перевірка прав доступу для адміністратора або власника
-    if model_name.lower() == 'orders' and not (request.user.is_staff or request.user.is_superuser or request.user.user_role == User_role.ADMIN.value):
-        messages.error(request, 'You do not have permission to delete this order.')
+    # Перевірки прав доступу
+    if model_name.lower() == 'orders' and not (request.user.is_staff or request.user.user_role == User_role.ADMIN.value):
+        messages.error(request, 'У вас немає дозволу на видалення цього замовлення.')
         return redirect(reverse('main_app:lists', kwargs={'model_name': 'orders'}))
 
     if model_name.lower() == 'users' and not request.user.is_staff:
-        messages.error(request, 'You do not have permission to delete this user.')
+        messages.error(request, 'У вас немає дозволу на видалення користувача.')
         return redirect(reverse('main_app:users_list', kwargs={'model_name': 'users'}))
 
     if request.method == 'POST':
-        # Для замовлень перевірка, чи вони створені менше ніж рік тому
+        # Обмеження по часу для замовлень
         if model_name.lower() == 'orders':
             one_year_ago = timezone.now() - timedelta(days=365)
             if instance.o_date_created > one_year_ago:
-                messages.error(request, 'You cannot delete orders that are less than one year old.')
-                return redirect(reverse('main_app:list', kwargs={'model_name': 'orders'}))
+                messages.error(request, 'Не можна видалити замовлення, яке створене менше року тому.')
+                return redirect(reverse('main_app:lists', kwargs={'model_name': 'orders'}))
 
-        # Для продуктів видаляємо зображення з файлової системи
-        if model_name.lower() == 'shoes':
-            for image in instance.images.all():
-                if image.image:
+        # Видалення пов’язаних зображень
+        if images_related_name:
+            related_images = getattr(instance, images_related_name).all()
+            for image in related_images:
+                if image.c_image and hasattr(image.c_image, 'path'):
                     try:
-                        os.remove(image.image.path)
+                        os.remove(image.c_image.path)
                     except FileNotFoundError:
                         pass
-            instance.images.all().delete()
+            related_images.delete()
 
-        if model_name.lower() == 'collections':
-            for image in instance.images.all():
-                if image.image:
-                    try:
-                        os.remove(image.image.path)
-                    except FileNotFoundError:
-                        pass
-            instance.images.all().delete()
-
-        # Видаляємо сам об'єкт
+        # Видалення об'єкта
         instance.delete()
+        messages.success(request, f'{model_name.capitalize()} успішно видалено.')
 
-        # Повідомлення про успіх
-        messages.success(request, f'{model_name.capitalize()} deleted successfully.')
-
-        # Повертаємо користувача до списку відповідних елементів
+        # Перенаправлення після видалення
         if model_name.lower() == 'shoes':
             return redirect(reverse('main_app:products_list'))
+        elif model_name.lower() == 'collections':
+            return redirect(reverse('main_app:lists', kwargs={'model_name': 'collections'}))
         elif model_name.lower() == 'orders':
-            return redirect(reverse('main_app:lists', kwargs={'model_name': 'orders'}), {'messages': messages.error})
+            return redirect(reverse('main_app:lists', kwargs={'model_name': 'orders'}))
         elif model_name.lower() == 'users':
             return redirect(reverse('authorization:delete_profile'))
 
-    # Якщо це не POST, то перенаправляємо на головну
-    return redirect(reverse('main_app:main'))
+    # 🔄 Якщо це не POST, перенаправляємо назад
+    return redirect(reverse('main_app:products_list'))
 
 
 

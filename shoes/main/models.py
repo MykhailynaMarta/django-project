@@ -61,10 +61,13 @@ class Collection(models.Model):
     id_collection = models.AutoField(primary_key=True)
     c_name = models.CharField(max_length=100, null=False, blank=False)
     c_description = models.CharField(max_length=250)
+    c_slug = models.SlugField(default='', null=False, blank=False)
 
     def get_pk(self):
         return self.id_collection
 
+    def __str__(self):
+        return self.c_name
 
 class CollectionImage(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name='c_images')
@@ -83,9 +86,11 @@ class Shoes(models.Model):
     sh_manufacturer = models.CharField(max_length=255, blank=True, null=True)
     sh_count = models.IntegerField(null=False, default=1)
     sh_price = models.DecimalField(max_digits=10, decimal_places=2)
+    sh_slug = models.SlugField(default='', null=False, blank=False)
+
     sh_gender = models.CharField(max_length=45, blank=True, null=False,
                                  default=Shoe_gender.FEMALE, choices=[(gender.value, gender.name) for gender in Shoe_gender])
-    collection = models.ForeignKey(Collection, null=True, on_delete=models.DO_NOTHING, related_name='sh_collection')
+    collection = models.ForeignKey(Collection, null=True, on_delete=models.SET_NULL, related_name='sh_collection')
 
     class Meta:
         db_table = 'shoes'
